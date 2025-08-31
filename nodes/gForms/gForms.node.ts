@@ -1,31 +1,55 @@
 import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
 
-const scopes = [
-	'https://www.googleapis.com/auth/forms.body',
-	'https://www.googleapis.com/auth/forms.responses.readonly',
-];
-
 export class gForms implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'gForms',
 		name: 'gForms',
 		icon: 'file:gForms.svg',
-		group: ['input'], // or ['transform'] if you prefer
+		group: ['input'],
 		version: 1,
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
-
-		// Service Account or OAuth2
-		credentials: [{ name: 'googleOAuth2Api', required: true, scopes }],
-
-		requestDefaults: {
-			baseURL: 'https://forms.googleapis.com/v1',
-			returnFullResponse: false,
-		},
-
+		usableAsTool: true,
+		credentials: [
+			{
+				name: 'googleApi',
+				required: true,
+				displayOptions: {
+					show: {
+						authentication: ['serviceAccount'],
+					},
+				},
+			},
+			{
+				name: 'googleDocsOAuth2Api',
+				required: true,
+				displayOptions: {
+					show: {
+						authentication: ['oAuth2'],
+					},
+				},
+			},
+		],
 		properties: [
+			{
+				displayName: 'Authentication',
+				name: 'authentication',
+				type: 'options',
+				options: [
+					{
+						name: 'Service Account',
+						value: 'serviceAccount',
+					}
+				],
+				default: 'serviceAccount',
+				displayOptions: {
+					show: {
+						'@version': [1],
+					},
+				},
+			},
 			{
 				displayName: 'Resource',
 				name: 'resource',
