@@ -1,5 +1,9 @@
-import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
+
+const scopes = [
+	'https://www.googleapis.com/auth/forms.body',
+	'https://www.googleapis.com/auth/forms.responses.readonly',
+];
 
 export class gForms implements INodeType {
 	description: INodeTypeDescription = {
@@ -13,18 +17,12 @@ export class gForms implements INodeType {
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		// Service Account only
-		credentials: [{ name: 'googleApi', required: true }],
+		// Service Account or OAuth2
+		credentials: [{ name: 'googleOAuth2Api', required: true, scopes }],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
 			returnFullResponse: false,
-			qs: {
-				scopes: [
-					'https://www.googleapis.com/auth/forms.body',
-					'https://www.googleapis.com/auth/forms.responses.readonly',
-				],
-			},
 		},
 
 		properties: [
