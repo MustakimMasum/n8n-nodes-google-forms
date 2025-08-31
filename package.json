@@ -1,9 +1,9 @@
 {
   "name": "n8n-nodes-google-forms",
-  "version": "0.1.0",
+  "version": "1.0",
   "description": "Automate Google Forms tasks with n8n. Create, manage, and analyze forms effortlessly",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package", "n8n", "google", "forms"
   ],
   "license": "MIT",
   "homepage": "https://axiomlab.dev",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/MustakimMasum/n8n-nodes-google-forms.git"
   },
   "engines": {
     "node": ">=20.15"
