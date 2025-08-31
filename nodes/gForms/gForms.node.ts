@@ -14,7 +14,16 @@ export class gForms implements INodeType {
 		outputs: [NodeConnectionType.Main],
 
 		// Service Account only
-		credentials: [{ name: 'googleApi', required: true }],
+		credentials: [
+			{
+				name: 'googleApi',
+				required: true,
+				scopes: [
+					'https://www.googleapis.com/auth/forms.body',
+					'https://www.googleapis.com/auth/forms.responses.readonly',
+				],
+			},
+		],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
