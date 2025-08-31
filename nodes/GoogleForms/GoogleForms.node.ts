@@ -1,7 +1,5 @@
-import type {
-	INodeType,
-	INodeTypeDescription,
-} from 'n8n-workflow';
+import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import { NodeConnectionType } from 'n8n-workflow';
 
 export class GoogleForms implements INodeType {
 	description: INodeTypeDescription = {
@@ -12,8 +10,8 @@ export class GoogleForms implements INodeType {
 		version: 1,
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'Google Forms' },
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 
 		credentials: [
 			// Reuse n8n's built-in Google OAuth2 credential
