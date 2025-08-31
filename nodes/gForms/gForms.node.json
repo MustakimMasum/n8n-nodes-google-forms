@@ -1,0 +1,17 @@
+{
+  "node": "n8n-nodes-google-forms",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Productivity"],
+  "resources": {
+    "primaryDocumentation": [
+      { "url": "https://github.com/MustakimMasum/n8n-nodes-google-forms" }
+    ],
+    "credentialDocumentation": [
+      { "url": "https://developers.google.com/identity/protocols/oauth2/service-account" }
+    ],
+    "generic": [
+      { "label": "Google Forms API", "url": "https://developers.google.com/forms/api" }
+    ]
+  }
+}
