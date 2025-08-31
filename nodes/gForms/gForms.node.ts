@@ -8,29 +8,33 @@ export class gForms implements INodeType {
 		icon: 'file:gForms.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle:
-			'={{ $parameter.resource === "form" ? $parameter.operation : $parameter.responseOperation }}',
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
-
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		/**
-		 * AUTH: Google Service Account (JWT)
-		 * Make sure your credential has the required scopes (see below) and, if using
-		 * Workspace, Domain-Wide Delegation with "Delegated email" set.
-		 */
-		credentials: [{ name: 'googleServiceAccountApi', required: true }],
+		// Use n8n's built-in Google credential (supports OAuth2 and Service Account)
+		credentials: [{ name: 'googleApi', required: true }],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
 			returnFullResponse: false,
-			// headers: { 'Content-Type': 'application/json' }, // optional
 		},
 
 		properties: [
-			// ---------- RESOURCE ----------
+			// --- REQUIRED so googleApi knows which flow to use ---
+			{
+				displayName: 'Authentication',
+				name: 'authentication',
+				type: 'options',
+				options: [
+					{ name: 'Service Account (JWT)', value: 'serviceAccount' },
+					{ name: 'OAuth2', value: 'oAuth2' },
+				],
+				default: 'serviceAccount',
+				description: 'How to authenticate with Google',
+			},
+
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -71,7 +75,9 @@ export class gForms implements INodeType {
 					request: {
 						method: 'POST',
 						url: '/forms',
-						body: { info: { title: '={{ $parameter.title }}' } },
+						body: {
+							info: { title: '={{ $parameter.title }}' },
+						},
 					},
 				},
 			},
@@ -79,7 +85,7 @@ export class gForms implements INodeType {
 			// Get
 			{
 				displayName: 'Form ID',
-				name: 'formIdGet',
+				name: 'formId',
 				type: 'string',
 				default: '',
 				required: true,
@@ -87,7 +93,7 @@ export class gForms implements INodeType {
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/forms/{{$parameter.formIdGet}}',
+						url: '=/forms/{{$parameter.formId}}',
 					},
 				},
 			},
@@ -95,7 +101,7 @@ export class gForms implements INodeType {
 			// Batch Update
 			{
 				displayName: 'Form ID',
-				name: 'formIdUpdate',
+				name: 'formId',
 				type: 'string',
 				default: '',
 				required: true,
@@ -108,13 +114,15 @@ export class gForms implements INodeType {
 				default: [],
 				typeOptions: { rows: 6 },
 				description:
-					'Array of <code>batchUpdate</code> requests. See the Google Forms API docs for the supported request shapes.',
+					'Array of batchUpdate requests as JSON. See the Google Forms API docs for reference.',
 				displayOptions: { show: { resource: ['form'], operation: ['batchUpdate'] } },
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/forms/{{$parameter.formIdUpdate}}:batchUpdate',
-						body: { requests: '={{ $parameter.requests }}' },
+						url: '=/forms/{{$parameter.formId}}:batchUpdate',
+						body: {
+							requests: '={{ $parameter.requests }}',
+						},
 					},
 				},
 			},
@@ -133,7 +141,7 @@ export class gForms implements INodeType {
 				],
 			},
 
-			// Common (response)
+			// List / Get shared parameter
 			{
 				displayName: 'Form ID',
 				name: 'formIdResp',
@@ -143,14 +151,14 @@ export class gForms implements INodeType {
 				displayOptions: { show: { resource: ['response'] } },
 			},
 
-			// List responses
+			// List
 			{
 				displayName: 'Filter',
 				name: 'filter',
 				type: 'string',
 				default: '',
-				placeholder: 'timestamp > 2025-01-01T00:00:00Z',
-				description: 'Use a timestamp filter for incremental syncs',
+				placeholder: 'timestamp > 2024-01-01T00:00:00Z',
+				description: 'Use e.g. timestamp > ISO-8601 to fetch incrementally',
 				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
 				routing: {
 					request: {
@@ -164,7 +172,7 @@ export class gForms implements INodeType {
 				},
 			},
 
-			// Get response
+			// Get
 			{
 				displayName: 'Response ID',
 				name: 'responseId',
