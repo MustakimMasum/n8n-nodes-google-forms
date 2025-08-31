@@ -17,6 +17,7 @@ export class GoogleForms implements INodeType {
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
+			authentication: 'googleOAuth2Api',
 			returnFullResponse: false,
 		},
 
