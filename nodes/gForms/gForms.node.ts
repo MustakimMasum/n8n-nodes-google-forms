@@ -1,7 +1,7 @@
 import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
-export class GoogleForms implements INodeType {
+export class gForms implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'gForms',
 		name: 'gForms',
