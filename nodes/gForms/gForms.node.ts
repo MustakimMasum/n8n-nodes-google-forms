@@ -6,15 +6,30 @@ export class gForms implements INodeType {
 		displayName: 'gForms',
 		name: 'gForms',
 		icon: 'file:gForms.svg',
-		group: ['transform'],
+		group: ['input'],
 		version: 1,
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		// Use n8n's built-in Google credential (supports OAuth2 and Service Account)
-		credentials: [{ name: 'googleApi', required: true }],
+		/**
+		 * Credentials: bind to the Authentication selector via displayOptions:
+		 * - Service Account -> googleApi
+		 * - OAuth2 -> googleOAuth2Api (generic Google OAuth)
+		 */
+		credentials: [
+			{
+				name: 'googleApi',
+				required: true,
+				displayOptions: { show: { authentication: ['serviceAccount'] } },
+			},
+			{
+				name: 'googleOAuth2Api',
+				required: true,
+				displayOptions: { show: { authentication: ['oAuth2'] } },
+			},
+		],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
@@ -22,7 +37,7 @@ export class gForms implements INodeType {
 		},
 
 		properties: [
-			// --- REQUIRED so googleApi knows which flow to use ---
+			// REQUIRED: tells n8n which credential to inject
 			{
 				displayName: 'Authentication',
 				name: 'authentication',
@@ -75,9 +90,7 @@ export class gForms implements INodeType {
 					request: {
 						method: 'POST',
 						url: '/forms',
-						body: {
-							info: { title: '={{ $parameter.title }}' },
-						},
+						body: { info: { title: '={{ $parameter.title }}' } },
 					},
 				},
 			},
@@ -114,15 +127,13 @@ export class gForms implements INodeType {
 				default: [],
 				typeOptions: { rows: 6 },
 				description:
-					'Array of batchUpdate requests as JSON. See the Google Forms API docs for reference.',
+					'Array of batchUpdate requests. See the Google Forms API docs for the supported request shapes.',
 				displayOptions: { show: { resource: ['form'], operation: ['batchUpdate'] } },
 				routing: {
 					request: {
 						method: 'POST',
 						url: '=/forms/{{$parameter.formId}}:batchUpdate',
-						body: {
-							requests: '={{ $parameter.requests }}',
-						},
+						body: { requests: '={{ $parameter.requests }}' },
 					},
 				},
 			},
@@ -141,7 +152,7 @@ export class gForms implements INodeType {
 				],
 			},
 
-			// List / Get shared parameter
+			// Shared (Response)
 			{
 				displayName: 'Form ID',
 				name: 'formIdResp',
@@ -157,8 +168,8 @@ export class gForms implements INodeType {
 				name: 'filter',
 				type: 'string',
 				default: '',
-				placeholder: 'timestamp > 2024-01-01T00:00:00Z',
-				description: 'Use e.g. timestamp > ISO-8601 to fetch incrementally',
+				placeholder: 'timestamp > 2025-01-01T00:00:00Z',
+				description: 'Use a timestamp filter for incremental syncs',
 				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
 				routing: {
 					request: {
