@@ -8,24 +8,29 @@ export class gForms implements INodeType {
 		icon: 'file:gForms.svg',
 		group: ['transform'],
 		version: 1,
+		subtitle:
+			'={{ $parameter.resource === "form" ? $parameter.operation : $parameter.responseOperation }}',
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
+
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		credentials: [
-			{
-				name: 'googleServiceAccountApi',
-				required: true,
-			},
-		],
+		/**
+		 * AUTH: Google Service Account (JWT)
+		 * Make sure your credential has the required scopes (see below) and, if using
+		 * Workspace, Domain-Wide Delegation with "Delegated email" set.
+		 */
+		credentials: [{ name: 'googleServiceAccountApi', required: true }],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
 			returnFullResponse: false,
+			// headers: { 'Content-Type': 'application/json' }, // optional
 		},
 
 		properties: [
+			// ---------- RESOURCE ----------
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -49,7 +54,7 @@ export class gForms implements INodeType {
 				options: [
 					{ name: 'Create', value: 'create', action: 'Create a form' },
 					{ name: 'Get', value: 'get', action: 'Get a form' },
-					{ name: 'Batch Update', value: 'batchUpdate', action: 'Update form items questions' },
+					{ name: 'Batch Update', value: 'batchUpdate', action: 'Update form items/questions' },
 				],
 			},
 
@@ -66,11 +71,7 @@ export class gForms implements INodeType {
 					request: {
 						method: 'POST',
 						url: '/forms',
-						body: {
-							info: {
-								title: '={{ $parameter.title }}',
-							},
-						},
+						body: { info: { title: '={{ $parameter.title }}' } },
 					},
 				},
 			},
@@ -78,7 +79,7 @@ export class gForms implements INodeType {
 			// Get
 			{
 				displayName: 'Form ID',
-				name: 'formId',
+				name: 'formIdGet',
 				type: 'string',
 				default: '',
 				required: true,
@@ -86,7 +87,7 @@ export class gForms implements INodeType {
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/forms/{{$parameter.formId}}',
+						url: '=/forms/{{$parameter.formIdGet}}',
 					},
 				},
 			},
@@ -94,7 +95,7 @@ export class gForms implements INodeType {
 			// Batch Update
 			{
 				displayName: 'Form ID',
-				name: 'formId',
+				name: 'formIdUpdate',
 				type: 'string',
 				default: '',
 				required: true,
@@ -104,18 +105,16 @@ export class gForms implements INodeType {
 				displayName: 'Requests (JSON)',
 				name: 'requests',
 				type: 'json',
-				default: '[]',
+				default: [],
 				typeOptions: { rows: 6 },
 				description:
-					'Array of batchUpdate requests as JSON. See the <a href="https://developers.google.com/forms/api/reference/rest/v1/forms/batchUpdate">Google Forms API docs</a> for reference.',
+					'Array of <code>batchUpdate</code> requests. See the Google Forms API docs for the supported request shapes.',
 				displayOptions: { show: { resource: ['form'], operation: ['batchUpdate'] } },
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/forms/{{$parameter.formId}}:batchUpdate',
-						body: {
-							requests: '={{ JSON.parse($parameter.requests) }}',
-						},
+						url: '=/forms/{{$parameter.formIdUpdate}}:batchUpdate',
+						body: { requests: '={{ $parameter.requests }}' },
 					},
 				},
 			},
@@ -123,7 +122,7 @@ export class gForms implements INodeType {
 			// ---------- RESPONSE OPERATIONS ----------
 			{
 				displayName: 'Operation',
-				name: 'operation',
+				name: 'responseOperation',
 				type: 'options',
 				noDataExpression: true,
 				displayOptions: { show: { resource: ['response'] } },
@@ -134,30 +133,29 @@ export class gForms implements INodeType {
 				],
 			},
 
-			// List, Get
+			// Common (response)
 			{
 				displayName: 'Form ID',
-				name: 'formId',
+				name: 'formIdResp',
 				type: 'string',
 				default: '',
 				required: true,
 				displayOptions: { show: { resource: ['response'] } },
 			},
 
-			// List
+			// List responses
 			{
 				displayName: 'Filter',
 				name: 'filter',
 				type: 'string',
 				default: '',
-
-				placeholder: 'timestamp > 2024-01-01T00:00:00Z',
-				description: 'Use e.g. timestamp &gt; ISO-8601 to fetch incrementally',
-				displayOptions: { show: { resource: ['response'], operation: ['list'] } },
+				placeholder: 'timestamp > 2025-01-01T00:00:00Z',
+				description: 'Use a timestamp filter for incremental syncs',
+				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/forms/{{$parameter.formId}}/responses',
+						url: '=/forms/{{$parameter.formIdResp}}/responses',
 						qs: {
 							filter: '={{ $parameter.filter || undefined }}',
 							pageSize: 1000,
@@ -166,18 +164,18 @@ export class gForms implements INodeType {
 				},
 			},
 
-			// Get
+			// Get response
 			{
 				displayName: 'Response ID',
 				name: 'responseId',
 				type: 'string',
 				default: '',
 				required: true,
-				displayOptions: { show: { resource: ['response'], operation: ['get'] } },
+				displayOptions: { show: { resource: ['response'], responseOperation: ['get'] } },
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/forms/{{$parameter.formId}}/responses/{{$parameter.responseId}}',
+						url: '=/forms/{{$parameter.formIdResp}}/responses/{{$parameter.responseId}}',
 					},
 				},
 			},
