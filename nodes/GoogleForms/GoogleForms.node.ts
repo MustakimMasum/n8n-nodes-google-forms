@@ -73,15 +73,15 @@ export class GoogleForms implements INodeType {
 			// Get
 			{
 				displayName: 'Form ID',
-				name: 'formIdForGet',
+				name: 'formId',
 				type: 'string',
-				default: '={{$parameter.formIdForUpdate}}',
+				default: '',
 				required: true,
 				displayOptions: { show: { resource: ['form'], operation: ['get'] } },
 				routing: {
 					request: {
 						method: 'GET',
-						url: '=/forms/{{$parameter.formIdForGet}}',
+						url: '=/forms/{{$parameter.formId}}',
 					},
 				},
 			},
@@ -89,9 +89,9 @@ export class GoogleForms implements INodeType {
 			// Batch Update
 			{
 				displayName: 'Form ID',
-				name: 'formIdForUpdate',
+				name: 'formId',
 				type: 'string',
-				default: '={{$parameter.formIdForGet}}',
+				default: '',
 				required: true,
 				displayOptions: { show: { resource: ['form'], operation: ['batchUpdate'] } },
 			},
@@ -107,7 +107,7 @@ export class GoogleForms implements INodeType {
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/forms/{{$parameter.formIdForUpdate || $parameter.formIdForGet}}:batchUpdate',
+						url: '=/forms/{{$parameter.formId}}:batchUpdate',
 						body: {
 							requests: '={{ JSON.parse($parameter.requests) }}',
 						},
