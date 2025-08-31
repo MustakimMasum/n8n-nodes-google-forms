@@ -13,11 +13,20 @@ export class GoogleForms implements INodeType {
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		credentials: [{ name: 'googleServiceAccountApi', required: true }],
+		credentials: [
+			{
+				name: 'googleServiceAccountApi',
+				required: true,
+				scopes: [
+					'https://www.googleapis.com/auth/forms.body',
+					'https://www.googleapis.com/auth/forms.responses.readonly',
+					'https://www.googleapis.com/auth/drive.file',
+				],
+			},
+		],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
-			authentication: 'googleServiceAccountApi',
 			returnFullResponse: false,
 		},
 
