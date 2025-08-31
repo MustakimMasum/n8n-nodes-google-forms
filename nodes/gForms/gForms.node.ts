@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
+import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
 
 export class gForms implements INodeType {
 	description: INodeTypeDescription = {
@@ -32,6 +32,17 @@ export class gForms implements INodeType {
 				},
 			},
 		],
+		requestDefaults: {
+			baseURL: 'https://forms.googleapis.com/v1',
+			returnFullResponse: false,
+			qs: {
+				scopes: [
+					'https://www.googleapis.com/auth/forms.body',
+					'https://www.googleapis.com/auth/forms.responses.readonly',
+				],
+			},
+		},
+
 		properties: [
 			{
 				displayName: 'Authentication',
