@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-google-forms",
   "version": "1.0.0",
-  "description": "Automate Google Forms tasks with n8n. Create, manage, and analyze forms effortlessly",
+  "description": "Automate Google Forms(TM) tasks with n8n. Create, manage, and analyze forms effortlessly",
   "keywords": ["n8n-community-node-package", "n8n", "google", "forms"],
   "license": "MIT",
   "homepage": "https://axiomlab.dev",
@@ -36,7 +36,7 @@
     ]
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "~8.32.0",
+    "@typescript-eslint/parser": "^7.7.0",
     "eslint": "^8.57.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
@@ -45,7 +45,7 @@
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
-    "n8n-workflow": "*"
+    "n8n-workflow": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"

@@ -4,12 +4,12 @@ import { NodeConnectionType } from 'n8n-workflow';
 export class GoogleForms implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'gForms',
-		name: 'googleForms',
+		name: 'gForms',
 		icon: 'file:gForms.svg',
-		group: ['input'],
+		group: ['transform'],
 		version: 1,
 		description: 'Work with Google Forms via the official Forms API',
-		defaults: { name: 'Google Forms' },
+		defaults: { name: 'gForms' },
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
