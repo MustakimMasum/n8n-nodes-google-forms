@@ -6,30 +6,15 @@ export class gForms implements INodeType {
 		displayName: 'gForms',
 		name: 'gForms',
 		icon: 'file:gForms.svg',
-		group: ['input'],
+		group: ['input'], // or ['transform'] if you prefer
 		version: 1,
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		/**
-		 * Credentials: bind to the Authentication selector via displayOptions:
-		 * - Service Account -> googleApi
-		 * - OAuth2 -> googleOAuth2Api (generic Google OAuth)
-		 */
-		credentials: [
-			{
-				name: 'googleApi',
-				required: true,
-				displayOptions: { show: { authentication: ['serviceAccount'] } },
-			},
-			{
-				name: 'googleOAuth2Api',
-				required: true,
-				displayOptions: { show: { authentication: ['oAuth2'] } },
-			},
-		],
+		// Service Account only
+		credentials: [{ name: 'googleApi', required: true }],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
@@ -37,19 +22,6 @@ export class gForms implements INodeType {
 		},
 
 		properties: [
-			// REQUIRED: tells n8n which credential to inject
-			{
-				displayName: 'Authentication',
-				name: 'authentication',
-				type: 'options',
-				options: [
-					{ name: 'Service Account (JWT)', value: 'serviceAccount' },
-					{ name: 'OAuth2', value: 'oAuth2' },
-				],
-				default: 'serviceAccount',
-				description: 'How to authenticate with Google',
-			},
-
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -127,7 +99,7 @@ export class gForms implements INodeType {
 				default: [],
 				typeOptions: { rows: 6 },
 				description:
-					'Array of batchUpdate requests. See the Google Forms API docs for the supported request shapes.',
+					'Array of batchUpdate requests. See the Google Forms API for supported request shapes.',
 				displayOptions: { show: { resource: ['form'], operation: ['batchUpdate'] } },
 				routing: {
 					request: {
