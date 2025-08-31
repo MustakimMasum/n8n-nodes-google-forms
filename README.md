@@ -1,48 +1,89 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-_node-name_
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use Google Forms in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+Google Forms is part of Google Workspace. The Google Forms API allows you to create and edit forms/quizzes, manage publish settings, read responses.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)
+[Compatibility](#compatibility)  
+[Usage](#usage)
+[Resources](#resources)  
+[Version history](#version-history)
 
-## Prerequisites
+## Installation
 
-You need the following installed on your development machine:
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation. You can install from the nodes panel (verified packages), via GUI using the npm package name, or manually from the command line on self-hosted instances.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Operations
 
-## Using this starter
+### Form
+Create Form — POST /v1/forms (creates an empty form with a title). 
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+Get Form — GET /v1/forms/{formId}. 
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+Batch Update — POST /v1/forms/{formId}:batchUpdate (add/move/update items, turn on quiz settings, etc.). 
 
-## More information
+Set Publish Settings — POST /v1/forms/{formId}:setPublishSettings (publish/unpublish; legacy forms don’t support this).
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+### Response
+List Responses — GET /v1/forms/{formId}/responses (supports filters timestamp > N and timestamp >= N for incremental pulls).
 
-## License
+Get Response — GET /v1/forms/{formId}/responses/{responseId}.
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Credentials
+
+### Prerequisites
+
+Google Cloud project.
+
+Enable Google Forms API (and Pub/Sub only if you plan to use Watches later).
+
+### Set up OAuth
+In Google Cloud, create an OAuth 2.0 Client ID (Application type: Web application).
+
+In n8n, create a Google OAuth2 credential (Generic or Single-service). Copy the redirect URI shown by n8n into your OAuth client’s Authorized redirect URIs. 
+
+Scopes:
+
+https://www.googleapis.com/auth/forms.body (create/edit via batchUpdate) 
+Google for Developers
+
+https://www.googleapis.com/auth/forms.responses.readonly (read responses) 
+Google for Developers
+
+Tip: If you’re self-hosting and see redirect_uri_mismatch, ensure the exact n8n callback URL is whitelisted in Google Cloud.
+
+## Compatibility
+
+n8n: Tested on n8n v1.94.0 and newer. (Community nodes are installable via GUI on modern 1.x builds; Cloud supports verified community nodes from 1.94.0.) 
+
+Node.js (for building locally): ≥ 18.17.0.
+
+## Usage
+
+Install the package via n8n’s Community Nodes UI (GUI install) and restart if prompted. 
+
+Create a credential: Add a Google OAuth2 credential in n8n and complete the consent flow. 
+
+Create a form: Use Form → Create to get a formId. 
+
+Add items: Use Form → Batch Update with a requests[] array (e.g., createItem, updateItem, moveItem). 
+
+Publish: Use Form → Set Publish Settings to make the form available to respondents. 
+
+Read responses: Use Responses → List with a timestamp >= ... filter for incremental syncs; or Get a specific response. 
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+* [Google Forms API](https://developers.google.com/workspace/forms/api/reference)
+* [Google OAuth in n8n](https://docs.n8n.io/integrations/builtin/credentials/google)
+* [Install community nodes](https://docs.n8n.io/integrations/community-nodes/installation)
+
+## Version history
+
+v1.0 — Initial release: Create Form, Get Form, Batch Update, Set Publish Settings, List Responses, Get Response (OAuth2).
