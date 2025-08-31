@@ -17,11 +17,6 @@ export class GoogleForms implements INodeType {
 			{
 				name: 'googleServiceAccountApi',
 				required: true,
-				scopes: [
-					'https://www.googleapis.com/auth/forms.body',
-					'https://www.googleapis.com/auth/forms.responses.readonly',
-					'https://www.googleapis.com/auth/drive.file',
-				],
 			},
 		],
 
@@ -117,7 +112,7 @@ export class GoogleForms implements INodeType {
 				routing: {
 					request: {
 						method: 'POST',
-						url: '=/forms/{{$parameter.formId}}:batchUpdate',
+						url: '/forms/{{$parameter.formId}}:batchUpdate',
 						body: {
 							requests: '={{ JSON.parse($parameter.requests) }}',
 						},
