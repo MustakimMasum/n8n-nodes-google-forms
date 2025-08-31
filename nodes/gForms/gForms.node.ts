@@ -13,26 +13,7 @@ export class gForms implements INodeType {
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 
-		credentials: [
-			{
-				name: 'googleApi',
-				required: true,
-				displayOptions: {
-					show: {
-						authentication: ['serviceAccount'],
-					},
-				},
-			},
-			{
-				name: 'gFormsOAuth2Api',
-				required: true,
-				displayOptions: {
-					show: {
-						authentication: ['oAuth2'],
-					},
-				},
-			},
-		],
+		credentials: [{ name: 'googleOAuth2Api', required: true }],
 
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
@@ -40,22 +21,6 @@ export class gForms implements INodeType {
 		},
 
 		properties: [
-			{
-				displayName: 'Authentication',
-				name: 'authentication',
-				type: 'options',
-				options: [
-					{
-						name: 'Service Account',
-						value: 'serviceAccount',
-					},
-					{
-						name: 'OAuth2',
-						value: 'oAuth2',
-					},
-				],
-				default: 'serviceAccount',
-			},
 			{
 				displayName: 'Resource',
 				name: 'resource',
