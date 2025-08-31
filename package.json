@@ -1,10 +1,8 @@
 {
   "name": "n8n-nodes-google-forms",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Automate Google Forms tasks with n8n. Create, manage, and analyze forms effortlessly",
-  "keywords": [
-    "n8n-community-node-package", "n8n", "google", "forms"
-  ],
+  "keywords": ["n8n-community-node-package", "n8n", "google", "forms"],
   "license": "MIT",
   "homepage": "https://axiomlab.dev",
   "author": {
@@ -16,16 +14,17 @@
     "url": "https://github.com/MustakimMasum/n8n-nodes-google-forms.git"
   },
   "engines": {
-    "node": ">=20.15"
+    "node": ">=18.17.0"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "build": "rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "format": "prettier nodes --write",
+    "lint": "eslint nodes package.json",
+    "lintfix": "eslint nodes package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint"
   },
   "files": [
     "dist"
@@ -33,7 +32,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/GoogleForms/GoogleForms.node.ts"
+      "dist/nodes/GoogleForms/GoogleForms.node.js"
     ]
   },
   "devDependencies": {
@@ -42,9 +41,13 @@
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
+    "rimraf": "^5.0.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
