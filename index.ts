@@ -1,1 +1,1 @@
-export { GoogleForms } from './nodes/GoogleForms/gForms.node';
+export { GoogleForms } from './nodes/gForms/gForms.node';
