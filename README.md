@@ -1,3 +1,5 @@
+![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+
 # n8n-nodes-google-forms
 
 This is an n8n community node. It lets you use Google Forms in your n8n workflows.
@@ -45,7 +47,7 @@ Enable Google Forms API (and Pub/Sub only if you plan to use Watches later).
 ### Set up OAuth
 In Google Cloud, create an OAuth 2.0 Client ID (Application type: Web application).
 
-In n8n, create a Google OAuth2 credential (Generic or Single-service). Copy the redirect URI shown by n8n into your OAuth client’s Authorized redirect URIs. 
+In n8n, create a Google OAuth2 credential. Copy the redirect URI shown by n8n into your OAuth client’s Authorized redirect URIs. 
 
 Scopes:
 
