@@ -1,4 +1,5 @@
-import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
+import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import { NodeConnectionType } from 'n8n-workflow';
 
 export class gForms implements INodeType {
 	description: INodeTypeDescription = {
@@ -7,60 +8,39 @@ export class gForms implements INodeType {
 		icon: 'file:gForms.svg',
 		group: ['input'],
 		version: 1,
+		subtitle:
+			'={{ $parameter.resource === "form" ? $parameter.operation : $parameter.responseOperation }}',
 		description: 'Work with Google Forms via the official Forms API',
 		defaults: { name: 'gForms' },
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 		usableAsTool: true,
+
+		// OAuth2 only (Google)
 		credentials: [
 			{
-				name: 'googleApi',
+				name: 'googleFormsOAuth2Api',
 				required: true,
-				displayOptions: {
-					show: {
-						authentication: ['serviceAccount'],
-					},
-				},
-			},
-			{
-				name: 'googleDocsOAuth2Api',
-				required: true,
-				displayOptions: {
-					show: {
-						authentication: ['oAuth2'],
-					},
-				},
 			},
 		],
+
 		requestDefaults: {
 			baseURL: 'https://forms.googleapis.com/v1',
 			returnFullResponse: false,
-			qs: {
-				scopes: [
-					'https://www.googleapis.com/auth/forms.body',
-					'https://www.googleapis.com/auth/forms.responses.readonly',
-				],
-			},
 		},
 
 		properties: [
+			// Keep this so n8n binds the OAuth2 credential reliably
 			{
 				displayName: 'Authentication',
 				name: 'authentication',
 				type: 'options',
-				options: [
-					{
-						name: 'Service Account',
-						value: 'serviceAccount',
-					}
-				],
-				default: 'serviceAccount',
-				displayOptions: {
-					show: {
-						'@version': [1],
-					},
-				},
+				options: [{ name: 'OAuth2', value: 'oAuth2' }],
+				default: 'oAuth2',
+				description: 'Uses a Google OAuth2 credential',
 			},
+
+			// -------- Resource --------
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -73,7 +53,7 @@ export class gForms implements INodeType {
 				],
 			},
 
-			// ---------- FORM OPERATIONS ----------
+			// ===================== FORM =====================
 			{
 				displayName: 'Operation',
 				name: 'operation',
@@ -85,10 +65,11 @@ export class gForms implements INodeType {
 					{ name: 'Create', value: 'create', action: 'Create a form' },
 					{ name: 'Get', value: 'get', action: 'Get a form' },
 					{ name: 'Batch Update', value: 'batchUpdate', action: 'Update form items/questions' },
+					{ name: 'Publish', value: 'publish', action: 'Publish or unpublish a form' },
 				],
 			},
 
-			// Create
+			// ---- Create ----
 			{
 				displayName: 'Title',
 				name: 'title',
@@ -97,16 +78,25 @@ export class gForms implements INodeType {
 				required: true,
 				description: 'Form title',
 				displayOptions: { show: { resource: ['form'], operation: ['create'] } },
+			},
+			{
+				displayName: 'Create Unpublished',
+				name: 'unpublished',
+				type: 'boolean',
+				default: false,
+				description: 'If true, create the form in an unpublished state',
+				displayOptions: { show: { resource: ['form'], operation: ['create'] } },
 				routing: {
 					request: {
 						method: 'POST',
 						url: '/forms',
+						qs: { unpublished: '={{ $parameter.unpublished || undefined }}' },
 						body: { info: { title: '={{ $parameter.title }}' } },
 					},
 				},
 			},
 
-			// Get
+			// ---- Get ----
 			{
 				displayName: 'Form ID',
 				name: 'formId',
@@ -122,7 +112,7 @@ export class gForms implements INodeType {
 				},
 			},
 
-			// Batch Update
+			// ---- Batch Update ----
 			{
 				displayName: 'Form ID',
 				name: 'formId',
@@ -135,7 +125,7 @@ export class gForms implements INodeType {
 				displayName: 'Requests (JSON)',
 				name: 'requests',
 				type: 'json',
-				default: [],
+				default: '[]',
 				typeOptions: { rows: 6 },
 				description:
 					'Array of batchUpdate requests. See the Google Forms API for supported request shapes.',
@@ -144,12 +134,43 @@ export class gForms implements INodeType {
 					request: {
 						method: 'POST',
 						url: '=/forms/{{$parameter.formId}}:batchUpdate',
-						body: { requests: '={{ $parameter.requests }}' },
+						body: { requests: '={{ JSON.parse($parameter.requests) }}' },
 					},
 				},
 			},
 
-			// ---------- RESPONSE OPERATIONS ----------
+			// ---- Publish / Unpublish (setPublishSettings) ----
+			{
+				displayName: 'Form ID',
+				name: 'formId',
+				type: 'string',
+				default: '',
+				required: true,
+				displayOptions: { show: { resource: ['form'], operation: ['publish'] } },
+			},
+			{
+				displayName: 'Publish State',
+				name: 'publishState',
+				type: 'options',
+				options: [
+					{ name: 'Published', value: 'PUBLISHED' },
+					{ name: 'Unpublished', value: 'UNPUBLISHED' },
+				],
+				default: 'PUBLISHED',
+				displayOptions: { show: { resource: ['form'], operation: ['publish'] } },
+				routing: {
+					request: {
+						method: 'POST',
+						url: '=/forms/{{$parameter.formId}}:setPublishSettings',
+						body: {
+							publishSettings: { publishState: '={{ $parameter.publishState }}' },
+							updateMask: 'publishState',
+						},
+					},
+				},
+			},
+
+			// ===================== RESPONSE =====================
 			{
 				displayName: 'Operation',
 				name: 'responseOperation',
@@ -173,7 +194,7 @@ export class gForms implements INodeType {
 				displayOptions: { show: { resource: ['response'] } },
 			},
 
-			// List
+			// ---- Responses: List ----
 			{
 				displayName: 'Filter',
 				name: 'filter',
@@ -182,19 +203,37 @@ export class gForms implements INodeType {
 				placeholder: 'timestamp > 2025-01-01T00:00:00Z',
 				description: 'Use a timestamp filter for incremental syncs',
 				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
+			},
+			{
+				displayName: 'Page Size',
+				name: 'pageSize',
+				type: 'number',
+				typeOptions: { minValue: 1, maxValue: 5000 },
+				default: 1000,
+				description: 'Max responses to return (API allows up to 5000)',
+				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
+			},
+			{
+				displayName: 'Page Token',
+				name: 'pageToken',
+				type: 'string',
+				default: '',
+				description: 'Use the token from a previous list response to fetch the next page',
+				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
 				routing: {
 					request: {
 						method: 'GET',
 						url: '=/forms/{{$parameter.formIdResp}}/responses',
 						qs: {
 							filter: '={{ $parameter.filter || undefined }}',
-							pageSize: 1000,
+							pageSize: '={{ $parameter.pageSize || undefined }}',
+							pageToken: '={{ $parameter.pageToken || undefined }}',
 						},
 					},
 				},
 			},
 
-			// Get
+			// ---- Responses: Get ----
 			{
 				displayName: 'Response ID',
 				name: 'responseId',

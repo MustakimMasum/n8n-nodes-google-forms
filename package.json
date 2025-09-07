@@ -2,7 +2,7 @@
   "name": "n8n-nodes-google-forms",
   "version": "1.0.0",
   "description": "Automate Google Forms(TM) tasks with n8n. Create, manage, and analyze forms effortlessly",
-  "keywords": ["n8n-community-node-package", "n8n", "google", "forms"],
+  "keywords": ["n8n-community-node-package", "n8n", "google", "forms", "Google Forms"],
   "license": "MIT",
   "homepage": "https://axiomlab.dev",
   "author": {
@@ -33,6 +33,9 @@
     "n8nNodesApiVersion": 1,
     "nodes": [
       "dist/nodes/gForms/gForms.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/GoogleFormsOAuth2Api.credentials.js"
     ]
   },
   "devDependencies": {
