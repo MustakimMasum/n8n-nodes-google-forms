@@ -11,7 +11,6 @@ export class GoogleFormsOAuth2Api implements ICredentialType {
 	name = 'googleFormsOAuth2Api';
 	displayName = 'Google Forms OAuth2 API';
 	extends = ['googleOAuth2Api'];
-	icon = 'file:gForms.svg';
 	documentationUrl = 'https://developers.google.com/workspace/forms';
 
 	properties: INodeProperties[] = [

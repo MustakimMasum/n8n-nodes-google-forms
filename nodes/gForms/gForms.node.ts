@@ -1,7 +1,7 @@
 import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
-export class gForms implements INodeType {
+export class GForms implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'gForms',
 		name: 'gForms',
@@ -64,7 +64,7 @@ export class gForms implements INodeType {
 				options: [
 					{ name: 'Create', value: 'create', action: 'Create a form' },
 					{ name: 'Get', value: 'get', action: 'Get a form' },
-					{ name: 'Batch Update', value: 'batchUpdate', action: 'Update form items/questions' },
+					{ name: 'Batch Update', value: 'batchUpdate', action: 'Update form items questions' },
 					{ name: 'Publish', value: 'publish', action: 'Publish or unpublish a form' },
 				],
 			},
@@ -84,7 +84,7 @@ export class gForms implements INodeType {
 				name: 'unpublished',
 				type: 'boolean',
 				default: false,
-				description: 'If true, create the form in an unpublished state',
+				description: 'Whether its true, create the form in an unpublished state',
 				displayOptions: { show: { resource: ['form'], operation: ['create'] } },
 				routing: {
 					request: {
@@ -217,6 +217,7 @@ export class gForms implements INodeType {
 				displayName: 'Page Token',
 				name: 'pageToken',
 				type: 'string',
+				typeOptions: { password: true },
 				default: '',
 				description: 'Use the token from a previous list response to fetch the next page',
 				displayOptions: { show: { resource: ['response'], responseOperation: ['list'] } },
